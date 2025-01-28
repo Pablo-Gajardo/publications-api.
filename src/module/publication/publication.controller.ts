@@ -5,7 +5,7 @@ import { PublicationDto } from './Dto/publication.dto';
 
 @Controller('/publication')
 export class PublicationController {
-    constructor(private readonly PublicationService:PublicationService) {}
+    constructor(private PublicationService:PublicationService) {}
 
     @Get('/')
     getstate(){
@@ -13,8 +13,8 @@ export class PublicationController {
     }
 
     @Post('/create')
-    createPublication(@Body() publication:PublicationDto){
-        return this.PublicationService.createPublication(publication);
+    createPublication(@Body() newPublication:PublicationDto){
+        return this.PublicationService.createPublication(newPublication);
     }
 
     @Post('/changeState')
@@ -37,7 +37,7 @@ export class PublicationController {
         return this.PublicationService.setPublication(id.id, publication.publication);
     }
 
-    @Delete('/deletePublication')
+    @Delete('/delete')
     deletePublication(@Body() id:{id:number}){
         return this.PublicationService.deletePublication(id.id);
     }
@@ -45,6 +45,11 @@ export class PublicationController {
     @Post('/getPublications/array')
     getPublicationsArr(@Body() idArray:{idArray:Array<number>}){
         return this.PublicationService.getPublicationsArr(idArray.idArray);
+    }
+
+    @Post('/getPublication')
+    getPublication(@Body() id:{id:number}){
+        return this.PublicationService.getPublication(id.id);
     }
 
 }

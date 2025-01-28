@@ -1,8 +1,8 @@
 export interface PublicationDto {
+    id: number;
     title: string;
     description: string;
     image: string;
-    publicationDate: Date;
     startDate: Date;
     endDate: Date;
     modificationDate: Date;
