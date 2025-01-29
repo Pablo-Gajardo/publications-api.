@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Delete, Body } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, UseInterceptors, UploadedFile, UploadedFiles } from '@nestjs/common';
 import { PublicationService } from './publication.service';
 import { PublicationDto } from './Dto/publication.dto';
 
@@ -50,6 +50,12 @@ export class PublicationController {
     @Post('/getPublication')
     getPublication(@Body() id:{id:number}){
         return this.PublicationService.getPublication(id.id);
+    }
+
+    @Post('/getPDF')
+    getPDF(){
+        return this.PublicationService.getPDF();
+
     }
 
 }

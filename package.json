@@ -30,6 +30,9 @@
     "dci_publications_api": "file:",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.12.0",
+    "pdf-lib": "^1.17.1",
+    "pdfkit": "^0.16.0",
+    "pdfmake": "^0.2.18",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.20"
@@ -40,6 +43,7 @@
     "@nestjs/testing": "^10.0.0",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.2",
+    "@types/multer": "^1.4.12",
     "@types/node": "^20.3.1",
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
