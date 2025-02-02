@@ -211,7 +211,7 @@ export class PublicationService {
     async saveImage(file: Express.Multer.File, title: string) {
         const currentDate = new Date().toISOString().split('T')[0];
         const sanitizedTitle = title.replace(/ /g, '_');
-        const imagePath = `img/${sanitizedTitle}-${currentDate}.png`;
+        const imagePath = `img/${sanitizedTitle}-${currentDate}.png`
         fs.writeFileSync(imagePath, file.buffer);
         return {
             message: 'Imagen guardada exitosamente',
