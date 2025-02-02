@@ -39,11 +39,13 @@ export class PublicationService {
         return await this.tagRepository.find();
     }
 
-    async setPublication(id:number, publication:PublicationDto){
+    async setPublication(id: number, publication: PublicationDto, image: Express.Multer.File) {
         await this.deletePublication(id);
-        await this.createPublication({...publication, id});
+        const { message, path } = await this.saveImage(image, publication.title);
+        const tags = await this.tagRepository.findBy({ id: In(publication.tags) });
+        const newPublication = this.publicationRepocitory.create({ ...publication, id, image: path, tags });
+        await this.publicationRepocitory.save(newPublication);
         return await this.getPublication(id);
-       // return await'Publicacion con el id : ' + id+ ' actualizada exitosamente a \n' + pucationNow;
     }
 
     async deletePublication(id:number){
@@ -100,28 +102,31 @@ async getPDF() {
 
         const pdfBytes = await pdfDoc.save();
         const currentDate = new Date().toISOString().split('T')[0];
-        const outputPath = `FDF_generate_Publications_DCI/publicaciones_DCI_${currentDate}.pdf`;
+        const namePdf = `publicaciones_DCI_${currentDate}.pdf`;
+        const outputPath = `PDF_generate_Publications_DCI/${namePdf}`;
         fs.writeFileSync(outputPath, pdfBytes);
 
-        return {
-            message: 'PDF generado exitosamente'
-        };
+        return namePdf;
     };
 
-
-
-
-
-    async saveImageAndCreatePublication(file: Express.Multer.File, publication: PublicationDto) {
-        const imagePath = `img/${file.filename}-${Date.now()}.png`;
-        fs.writeFileSync(imagePath, file.buffer);
-
-        const newPublication = await this.createPublication({ ...publication, image: imagePath });
-
-        return {
-            message: 'Publicación creada y imagen guardada exitosamente',
-            publication: newPublication,
-        };
+    async saveImageAndCreatePublication(image: Express.Multer.File, publication: PublicationDto) {
+        console.log(publication.title);
+        const { message, path } = await this.saveImage(image, publication.title);
+        const tags = await this.tagRepository.findBy({ id: In(publication.tags) });
+        const newPublication = this.publicationRepocitory.create({ ...publication, image: path, tags });
+        await this.publicationRepocitory.save(newPublication);
+        return { message, path };
     }
 
+    
+    async saveImage(file: Express.Multer.File, title: string) {
+        const currentDate = new Date().toISOString().split('T')[0];
+        const sanitizedTitle = title.replace(/ /g, '_');
+        const imagePath = `img/${sanitizedTitle}-${currentDate}.png`;
+        fs.writeFileSync(imagePath, file.buffer);
+        return {
+            message: 'Imagen guardada exitosamente',
+            path: imagePath
+        };
+    }
 }

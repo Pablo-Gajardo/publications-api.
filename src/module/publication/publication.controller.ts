@@ -1,6 +1,11 @@
-import { Controller, Post, Get, Delete, Body, UseInterceptors, UploadedFile, UploadedFiles } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, UseInterceptors, UploadedFile, UploadedFiles, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Res } from '@nestjs/common';
 import { PublicationService } from './publication.service';
 import { PublicationDto } from './Dto/publication.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CONFIGURABLE_MODULE_ID } from '@nestjs/common/module-utils/constants';
+import { of } from 'rxjs';
+import { join } from 'path';
+
 
 
 @Controller('/publication')
@@ -13,9 +18,21 @@ export class PublicationController {
     }
 
     @Post('/create')
-    createPublication(@Body() newPublication:PublicationDto){
-        return this.PublicationService.createPublication(newPublication);
+    @UseInterceptors(FileInterceptor('image'))
+    async CreatePublcation(@UploadedFile(new ParseFilePipe(),)
+      image: Express.Multer.File,
+      @Body('publication') publicationString: string,
+    ) {
+      try {
+        const publication: PublicationDto = JSON.parse(publicationString); // Parsea el string a objeto
+        await this.PublicationService.saveImageAndCreatePublication(image, publication);
+        return 'Imagen guardada y publicación creada';
+      } catch (error) {
+        console.error("Error al procesar la publicación:", error);
+        return { error: 'Error al procesar la publicación. Asegúrese de que el JSON sea válido.' }; 
+      }
     }
+    
 
     @Post('/changeState')
     changeStatePublication(@Body() id:{id:number}){
@@ -33,8 +50,20 @@ export class PublicationController {
     }
 
     @Post('/setPublication')
-    setPublication(@Body() id:{id:number},@Body() publication:{publication:PublicationDto}){
-        return this.PublicationService.setPublication(id.id, publication.publication);
+    @UseInterceptors(FileInterceptor('image'))
+    async setPublication(@UploadedFile(new ParseFilePipe(),)
+      image: Express.Multer.File,
+      @Body('publication') publicationString: string, 
+      @Body('id') id: number)
+      {
+        try {
+            const publication: PublicationDto = JSON.parse(publicationString); // Parsea el string a objeto
+            await this.PublicationService.setPublication(id, publication, image);
+            return 'publicación '+id+' modificada exitosamente';
+          } catch (error) {
+            console.error("Error al procesar la publicación:", error);
+            return { error: 'Error al procesar la publicación. Asegúrese de que el JSON sea válido.' }; 
+          }
     }
 
     @Delete('/delete')
@@ -53,8 +82,9 @@ export class PublicationController {
     }
 
     @Post('/getPDF')
-    getPDF(){
-        return this.PublicationService.getPDF();
+    async getPDF(@Res() res){
+        const pdf = await this.PublicationService.getPDF();
+        return of(res.sendFile(join(process.cwd(),"PDF_generate_Publications_DCI/"+pdf))); 
 
     }
 
