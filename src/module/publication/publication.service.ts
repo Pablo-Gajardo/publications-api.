@@ -192,7 +192,6 @@ export class PublicationService {
      * @throws {Error} - Throws an error if saving the image or creating the publication fails.
      */
     async saveImageAndCreatePublication(image: Express.Multer.File, publication: PublicationDto) {
-        console.log(publication.title);
         const { message, path } = await this.saveImage(image, publication.title);
         const tags = await this.tagRepository.findBy({ id: In(publication.tags) });
         const newPublication = this.publicationRepocitory.create({ ...publication, image: path, tags });
@@ -217,5 +216,10 @@ export class PublicationService {
             message: 'Imagen guardada exitosamente',
             path: imagePath
         };
+    }
+
+    async updatePublication(id: number, publication: PublicationDto, image: Express.Multer.File) {
+            this.saveImage(image, publication.title);
+            this.getPDF();
     }
 }

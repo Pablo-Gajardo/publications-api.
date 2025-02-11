@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Delete, Body, UseInterceptors, UploadedFile, UploadedFiles, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Res } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, UseInterceptors, UploadedFile, UploadedFiles, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, Res, Put } from '@nestjs/common';
 import { PublicationService } from './publication.service';
 import { PublicationDto } from './Dto/publication.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -58,7 +58,7 @@ export class PublicationController {
    * @param id - The ID of the publication to change state.
    * @returns The result of the state change operation.
    */
-  @Post('/changeState')
+  @Put('/changeState')
   changeStatePublication(@Body() id: { id: number }) {
     return this.PublicationService.changeStatePublication(id.id);
   }
@@ -67,7 +67,7 @@ export class PublicationController {
    * Endpoint to get tags.
    * @returns The tags from the service.
    */
-  @Post('/getTags')
+  @Get('/getTags')
   getTask() {
     return this.PublicationService.getTags();
   }
@@ -76,7 +76,7 @@ export class PublicationController {
    * Endpoint to get all publications.
    * @returns The publications from the service.
    */
-  @Post('/getPublications')
+  @Get('/getPublications')
   getPublications() {
     return this.PublicationService.getPublications();
   }
@@ -91,7 +91,7 @@ export class PublicationController {
    * 
    * @throws Will throw an error if the publicationString is not a valid JSON.
    */
-  @Post('/setPublication')
+  @Put('/setPublication')
   @UseInterceptors(FileInterceptor('image'))
   async setPublication(
     @UploadedFile(new ParseFilePipe()) image: Express.Multer.File,
@@ -123,7 +123,7 @@ export class PublicationController {
    * @param idArray - An array of publication IDs.
    * @returns The publications corresponding to the given IDs.
    */
-  @Post('/getPublications/array')
+  @Get('/getPublications/array')
   getPublicationsArr(@Body() idArray: { idArray: Array<number> }) {
     return this.PublicationService.getPublicationsArr(idArray.idArray);
   }
@@ -133,7 +133,7 @@ export class PublicationController {
    * @param id - The ID of the publication to retrieve.
    * @returns The publication corresponding to the given ID.
    */
-  @Post('/getPublication')
+  @Get('/getPublication')
   getPublication(@Body() id: { id: number }) {
     return this.PublicationService.getPublication(id.id);
   }
@@ -143,7 +143,7 @@ export class PublicationController {
    * @param res - The response object to send the PDF file.
    * @returns The PDF file of publications.
    */
-  @Post('/getPDF')
+  @Get('/getPDF')
   async getPDF(@Res() res) {
     const pdf = await this.PublicationService.getPDF();
     return of(res.sendFile(join(process.cwd(), "PDF_generate_Publications_DCI/" + pdf)));
