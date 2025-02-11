@@ -222,4 +222,40 @@ export class PublicationService {
             this.saveImage(image, publication.title);
             this.getPDF();
     }
+
+    async createTag(name: string) {
+        const newTag = this.tagRepository.create({ name });
+        return await this.tagRepository.save(newTag);
+    }
+
+    async deleteTag(id: number) {
+        const tag = await this.tagRepository.findOne({ where: { id }, relations: ['publications'] });
+        if (!tag) {
+            throw new Error('Etiqueta no encontrada');
+        }
+
+        if (tag.publications && Array.isArray(tag.publications)) {
+            for (const publication of tag.publications) {
+                if (publication.tags) {
+                    publication.tags = publication.tags.filter(t => t.id !== id);
+                    await this.publicationRepocitory.save(publication);
+                }
+            }
+        }
+
+        await this.publicationRepocitory.createQueryBuilder()
+            .relation(Publication, "tags")
+            .of(tag.publications)
+            .remove(tag);
+
+        await this.tagRepository.delete(id);
+        return { message: 'Etiqueta eliminada exitosamente', idDeleted: id };
+    }
+
+    async createTagsArray(tags: Array<string>) {
+        const newTags = tags.map(tag => this.tagRepository.create({ name: tag }));
+        return await this.tagRepository.save(newTags);
+    }
+
+
 }

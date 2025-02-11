@@ -148,5 +148,19 @@ export class PublicationController {
     const pdf = await this.PublicationService.getPDF();
     return of(res.sendFile(join(process.cwd(), "PDF_generate_Publications_DCI/" + pdf)));
   }
-  
+
+  @Post('/Create/Tag')
+  async CreateTag(@Body() tagName: { tagName: string }) {
+    return this.PublicationService.createTag(tagName.tagName);
+  }
+
+  @Post('/Create/TagsArray')
+  async CreateTagsArray(@Body() tagName: { tagNameArray: string[] }) {
+    return this.PublicationService.createTagsArray(tagName.tagNameArray);
+  }
+
+  @Delete('/Delete/Tag')
+  async DeleteTag(@Body() id: { id: number }) {
+    return this.PublicationService.deleteTag(id.id);
+  }
 }
